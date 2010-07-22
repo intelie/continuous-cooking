@@ -27,15 +27,16 @@ java_pkg = value_for_platform(
   "default" => "sun-java6-jdk"
 )
 
-if node.platform =~ /ubuntu/i && node.platform_version == "10.04" # lucid doesn not have repo with sun-java6-jdk yet...
-  remote_file "/etc/apt/sources.list.d/archive.canonical.com.list" do
+case node.platform
+when "ubuntu" 
+  include_recipe "apt"
+  
+  template "/etc/apt/sources.list.d/canonical.com.list" do
     mode "0644"
-    source "archive.canonical.com.list"
-    not_if "test -f /etc/apt/sources.list.d/archive.canonical.com.list"
+    source "canonical.com.list.erb"
     notifies :run, resources(:execute => "apt-get update"), :immediately
   end
 end
-
 
 # execute "update-java-alternatives" do
 #   command "update-java-alternatives -s java-6-sun"
